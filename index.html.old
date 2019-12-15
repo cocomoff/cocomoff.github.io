@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>
+		ここもふ.いんふぉ
+  </title>
+  <meta name="author" content="Jake Rocheleau">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="HandheldFriendly" content="true">
+  <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:800,400,600,700' rel='stylesheet'>
+  <link href='http://fonts.googleapis.com/css?family=EB+Garamond:800,400,600,700' rel='stylesheet'>
+  <link href='http://fonts.googleapis.com/css?family=Volkhov' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Ruluko' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+  <link rel="stylesheet" type="text/css" href="responsive.css">
+</head>
+
+<body id="w" itemscope itemtype="http://schema.org/Person">
+
+<header class="clearfix">
+	<div id="info">			
+		<h1><span itemprop="name">ここもふ.いんふぉ</span></h1>
+		<small itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
+		  <span itemprop="addressLocality">Twitter: 
+		  <a href="http://twitter.com/cocomoff/">@cocomoff</a></span> 
+		  <span itemprop="addressRegion">Blog: 
+		  <a href="http://blog.cocomoff.info/">パラボラブログ</a></span><br />
+		  <span itemprop="addressCountry">Last Update: 2015年1月9日</span>
+		  <br />
+		  <span><a href="http://twitter.com/cocomoff/">@cocomoff</a>の
+		  固定ドメイン用サイトです．ブログが好きです．</span>
+		</small>
+	</div>
+	<div id="photo"><img src="images/icon.jpg" width="128" height="128" alt="my_icon"></div>
+</header>
+		
+<section id="articles">
+ <p>
+  Reveal.jsを使ったhtml+javascriptスライドのサンプルは<a href="http://cocomoff.github.io/sample/">こちらのページです</a>．
+ </p>
+<h2 itemprop="name">Photos (2015)</h2>
+
+<p>
+	Coming soon
+</p>
+</section>
+
+<section id="articles">
+<h2 itemprop="name">Photos (2014)</h2>
+
+<p>
+	<img src="photos/kosice1.png" width="128" height="128">
+	<img src="photos/kosice2.png" width="128" height="128">
+	<img src="photos/kk1.jpg" width="128" height="128">
+	<img src="photos/kk2.jpg" width="128" height="128">
+</p>
+</section>
+
+<section id="articles">
+<h2 itemprop="name">Photos (2013)</h2>
+
+<p>
+	<img src="photos/zollverein.png" width="128" height="128">
+	<img src="photos/cologne.png" width="128" height="128">
+	<img src="photos/gate_c.png" width="128" height="128">
+	<img src="photos/gate_g.png" width="128" height="128">
+	<img src="photos/stone.png" width="128" height="128">
+	<br />
+	<!--
+	左から
+	1)Zollverein炭鉱,
+	2)ケルン大聖堂,
+	3)チェコプルゼニのピルスナーウルケル工場,
+	4)ドイツトーリア,
+	5)Königswinterの石塔跡,
+	になります．
+	-->
+</p>
+</section>
+
+<section id="articles">
+	<h2 itemprop="name">Articles; My Writings in Japanese.</h2>
+	<h3>Scala Advent Calendar</h3>
+	<ul>
+		<li><a href="http://blog.cocomoff.info/archives/2011/12/20/4851/" title="[scala][advent]Scalaは機械学習に使えるかな? #scalaadvent2011 | パラボラアンテナ日記@ドイツ">Scalaは機械学習に使えるかな?</a> (2011)</li>
+		<li><a href="http://blog.cocomoff.info/archives/2013/12/19/6386/" title="Scala用の機械学習関係ライブラリ関係を調べてみる | パラボラアンテナ日記@ドイツ">Scala用の機械学習関係ライブラリ関係を調べてみる</a> (2013)</li>
+	</ul>
+	<h3>Machine Learning Advent Calendar</h3>
+	<ul>
+		<li><a href="http://blog.cocomoff.info/archives/2012/12/12/5542/" title="[日記]制約充足問題についてのゆるふわな話 | パラボラアンテナ日記@ドイツ">制約充足問題についてのゆるふわな話</a> (2012)</li>
+		<li><a href="http://blog.cocomoff.info/archives/2013/12/19/6413/" title="Subgroup DiscoveryとPython Orangeで遊んでいた | パラボラアンテナ日記@ドイツ">Subgroup DiscoveryとPython Orangeで遊んでいた</a> (2013)</li>
+		<li><a href='http://blog.cocomoff.info/archives/2014/12/11/7121/' title="Scikit-learnを使って主成分分析などを中心に遊んだ | 左京区パラボラ日記">Scikit-learnを使って主成分分析などを中心に遊んだ</a> (2014)</li>
+	</ul>
+	<h3>就活したことないAdvent Calendar 2012</h3>
+	<ul>
+		<li><a href="http://blog.cocomoff.info/archives/2012/12/13/5525/" title="[日記]思えば遠くまで来てしまったなぁ | パラボラアンテナ日記@ドイツ">思えば遠くまで来てしまったなぁ</a></li>
+		<li><a href="http://blog.cocomoff.info/archives/2012/12/20/5631/" title="[日記]学生生活で必要そうなメタ的なものについて | パラボラアンテナ日記@ドイツ">学生生活で必要そうなメタ的なものについて</a></li>
+	</ul>
+	<h3>その他</h3>
+	<ul>
+		<li>ディック言語 <a href="https://ja.wikipedia.org/wiki/%E3%83%87%E3%82%A3%E3%83%83%E3%82%AF%E8%A8%80%E8%AA%9E">Wikipedia:ディック言語</a></li>
+		<li>I make a LaTeX file from the <a href="http://en.wikipedia.org/wiki/Pattern_language_%28formal_languages%29">Wikipedia page</a>): [<a href="note/pattern_language_wikipedia_latex.tex">latex source file</a>] [<a href="note/pattern_language_wikipedia.pdf">PDF file</a>]</li>
+	</ul>
+</section>
+
+<section id="articles">
+	<h2 itemprop="name">Datasets</h2>
+	<p>
+	I'm planning to publish datasets from MLB Pitch/FX systems<br />
+	for promoting data science activities in sports.
+	</p>
+</section>
+
+</body>
+</html>
