@@ -14,7 +14,7 @@ html {
 body { 
 	background: #f2f2f2;
 	/* url('images/bg-tile.png'); */
-	font-size: 62.5%; 
+	/* font-size: 62.5%; */
 	/* padding-bottom: 65px;  */
 }
 
@@ -22,25 +22,35 @@ body {
 
 h1, h2 { font-family: "Ruluko", "Open Sans", "Trebuchet MS", Arial, sans-serif;  }
 h3, h4 { font-family: "Ruluko", "Open Sans", "Trebuchet MS", Verdana, Arial, sans-serif; }
-h1 { color: #454545; font-size: 3.6em; margin-bottom: 6px; }
-h2 { color: #484848; font-size: 2.5em; margin-bottom: 10px; text-decoration: underline; }
-h3 { color: #777; font-weight: normal; font-size: 1.8em; margin-bottom: 10px; }
-h4 { color: #656565; font-weight: bold; font-size: 1.75em; margin-bottom: 4px; }
+h1 { color: #454545; font-size: 1.6em; margin-bottom: 6px; }
+h2 { color: #484848; font-size: 1.3em; margin-bottom: 10px; text-decoration: underline; }
+h2.border {
+	color: #484848; 
+	font-size: 1.3em; 
+	margin-bottom: 10px;
+	text-decoration: none;
+	width: auto;
+	display: inline-block;
+	/* border-bottom: 2px solid #e23104; */
+	border-bottom: 2px solid #484848;
+}
+h3 { color: #777; font-weight: normal; font-size: 1.2em; margin-bottom: 10px; }
+h4 { color: #656565; font-weight: bold; font-size: 1.1em; margin-bottom: 4px; }
 
 /* Articles */
 
 p { 
 	font-family: "Ruluko", "Open Sans", "Droid Serif", serif; 
 	color: #565656; 
-	font-size: 1.8em; 
+	font-size: 1em; 
 	line-height: 1.2em; 
-	margin-bottom: 15px; 
-	padding-left: 35px; 
+	margin-bottom: 5px; 
+	padding-left: 25px; 
 }
 small { 
 	font-family: "Ruluko", "Open Sans", "Droid Serif", serif; 
 	color: #656565; 
-	font-size: 1.6em; 
+	font-size: 1em; 
 	display: block; 
 	margin-bottom: 6px; 
 }
@@ -84,7 +94,7 @@ a:hover {
 	padding-top: 35px; 
 	background: #fff; 
 	min-width: 240px; 
-	max-width: 700px; 
+	max-width: 1200px; 
 	border-bottom-right-radius: 8px; 
 	border-bottom-left-radius: 8px; 
 	-webkit-border-bottom-left-radius: 8px; 
