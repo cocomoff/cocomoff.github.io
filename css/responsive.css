@@ -9,7 +9,7 @@
 		text-align: center;
 	}
 	#w { padding: 20px 15px; }
-	p { padding: 0; }
+	p { padding: 0; text-align: center;}
 }
 
 @media only screen and (max-width: 770px) {
