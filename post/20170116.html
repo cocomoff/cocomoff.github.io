@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      taki["github-page"]
+    </title>
+    <meta name="author" content="Jake Rocheleau">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:800,400,600,700' rel='stylesheet'>
+    <link href='http://fonts.googleapis.com/css?family=EB+Garamond:800,400,600,700' rel='stylesheet'>
+    <link href='http://fonts.googleapis.com/css?family=Volkhov' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Ruluko' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/styles.css">
+    <link rel="stylesheet" type="text/css" href="../css/responsive.css">
+  
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+  
+    <script type="text/x-mathajx-config">
+    MathJax.Hub.Config({
+    tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[','\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+    extensions: ["AMSmath.js", "AMSsymbols.js"] }
+    }
+    });
+  </script>
+</head>
+<body id="w" itemscope itemtype="http://schema.org/Person">
+
+<header class="clearfix">
+	<div id="info">
+        <h4>
+            <a href="/index.html">Topに戻る</a>
+        </h4>
+		<h1>
+            Unexpected Co-occurrences of Patterns
+        </h1>
+		<small itemprop="address" itemscope itemtype="http://schema.org/PostalAddress"></small>
+		<span itemprop="addressCountry">作成日: 2017/01/16</span>
+	</div>
+</header>
+<article>
+<section id="articles">
+
+    <script type="text/javascript"
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+  
+  <h1 id="前提条件">前提条件</h1>
+  
+  <ul>
+  <li>トランザクションデータベース \(D\) (トランザクション数 \( |D| \) )</li>
+  <li>全アイテム集合 \(\Omega\)</li>
+  <li>各トランザクション \( t\subseteq \Omega \) (アイテム数/大きさ \(|t|\))</li>
+  </ul>
+  
+  <h1 id="基本的な考え方">基本的な考え方</h1>
+  
+  <blockquote>
+  <p>A transaction is <strong>anomalous</strong> when it deviates from what we
+  expect considering the whole dataset.</p>
+  </blockquote>
+  
+  <h1 id="いくつかの取り組み方">いくつかの取り組み方</h1>
+  
+  <h2 id="class-0-unexpected-transaction-length">Class 0: Unexpected Transaction Length</h2>
+  
+  <ul>
+  <li>長さが特殊なもの</li>
+  <li>定量化方法</li>
+  </ul>
+  
+  <blockquote>
+  <p>\( \mathit{score}_0 (t) = -\log P(|t|) = \log \frac{|t&rsquo;\in D\mid |t&rsquo;|=|t||}{|D|} \)</p>
+  </blockquote>
+  
+  <h2 id="class-1-unexpected-transaction">Class 1: Unexpected Transaction</h2>
+  
+  <ul>
+  <li>データベースの中で特殊なもの</li>
+  <li>定量化方法については別記</li>
+  </ul>
+  
+  <h2 id="class-2-unexpected-co-occurrences">Class 2: Unexpected Co-occurrences</h2>
+  
+  <ul>
+  <li>表題</li>
+  <li>考え方: 個別に出現するよりも低くしか共起しない組</li>
+  </ul>
+  
+  <blockquote>
+  <p>A transaction contains a <strong>class 2 anomaly</strong> when it contains two patterns
+  that occur much less often together in the data than what could be expected
+  from their individual supports</p>
+  </blockquote>
+  
+  <ul>
+  <li>定量化方法: 共起しない(第1項)、両方の個別出現が多い(第2項)ものが良いスコアを持つ</li>
+  </ul>
+  
+  <blockquote>
+  <p>\( \mathit{score}_2 (t) = -\max _{{X, Y\in\mathcal{S} | X, Y\subseteq t}}
+  -\log P(XY) + \log(P(X)\times P(Y))\)</p>
+  </blockquote>
+    
+  <h1 id="論文など">論文など</h1>
+  
+  <ul>
+  <li>L. Akoglu, H. Tong, J. Vreeken, and C. Faloutsos. Fast and
+  reliable anomaly detection in categorical data. In CIKM, pages 415–424, 2012.</li>
+  <li>K. Smets and J. Vreeken. The odd one out: Identifying and
+  characterising anomalies. In SDM, pages 804–815, 2011.</li>
+  </ul>
+</section>
+</article>
+</body>
+</html>

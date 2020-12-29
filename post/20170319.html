@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      taki["github-page"]
+    </title>
+    <meta name="author" content="Jake Rocheleau">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:800,400,600,700' rel='stylesheet'>
+    <link href='http://fonts.googleapis.com/css?family=EB+Garamond:800,400,600,700' rel='stylesheet'>
+    <link href='http://fonts.googleapis.com/css?family=Volkhov' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Ruluko' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/styles.css">
+    <link rel="stylesheet" type="text/css" href="../css/responsive.css">
+  
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+  
+    <script type="text/x-mathajx-config">
+    MathJax.Hub.Config({
+    tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[','\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+    extensions: ["AMSmath.js", "AMSsymbols.js"] }
+    }
+    });
+  </script>
+</head>
+
+<body id="w" itemscope itemtype="http://schema.org/Person">
+
+<header class="clearfix">
+	<div id="info">
+        <h4>
+            <a href="/index.html">Topに戻る</a>
+        </h4>
+		<h1>
+            [Julia] SAX (Symbolic Aggregate approXimation)を復習した
+        </h1>
+		<small itemprop="address" itemscope itemtype="http://schema.org/PostalAddress"></small>
+		<span itemprop="addressCountry">作成日: 2017/03/19</span>
+	</div>
+</header>
+<article>
+<section id="articles">
+
+    <p><strong><a href="https://bitbucket.org/cocomoff/juliasax">レポジトリです</a></strong></p>
+
+    <p>系列データの離散化法として(おそらく)最も有名なSAXを復習しました．簡単にまとめると</p>
+    
+    <ol>
+    <li>系列データをいくつかの部分系列に分割</li>
+    <li>個別の部分系列で平均値を計算</li>
+    <li>記号と分割点(breakpoints)を計算</li>
+    <li>個別の平均値がどの記号に当て嵌まるのか分割点から計算</li>
+    </ol>
+    
+    <p>という手法です．Keoghらの前提では分割点の計算にガウス分布を使っていますが，
+    世の中のノラ実装を見ていると，適当にuniform dist.と仮定して記号化してるものもありました．</p>
+    
+    <p>Keoghらのbreakpoints計算方法はサイトにMatlabコードが公開されていて簡単です．</p>
+    
+    <pre><code class="language-python">startRange = 2;
+stdc = 1;
+endRange = 512;
+table = cell(endRange-startRange, 1);
+for r = startRange:endRange
+    table{r-startRange+1} = norminv((1:r-1) / r, 0, stdc);
+end</code></pre>
+    
+    <p>Juliaにはnorminvが実装されていないので少し考えましたが，とりあえずStatsFunsライブラリに実装
+    されているnorminvcdf関数で代用しました．計算結果も同じでした(Matlabの実行結果は
+    Octave 4.0.0で確認，JuliaはJulia 0.5で確認．どちらもUbuntu 16.04で実行)．
+    Juliaでは</p>
+    
+    <pre><code class="language-julia">v = collect(1:n-1) / n
+vv = [norminvcdf(0.0, 1.0, elem) for elem in v]</code></pre>
+    
+    <p>のように計算しましたが，collectいらないと思います(未確認)．
+    少し動作テストしたら，実際のデータに入れてみたいと思います．</p>
+    
+    <p><strong>人工データ例</strong>
+    
+    <figure >
+        
+            <img src="/photo/170319_fig1.png" />
+        
+        
+        <figcaption>
+            <h4>元データ(random walkで作成)</h4>
+            
+        </figcaption>
+        
+    </figure>
+    </p>
+    
+    
+    <figure >
+        
+            <img src="/photo/170319_fig2.png" />
+        
+        
+        <figcaption>
+            <h4>正規化したデータとSAX(横バーで表現)</h4>
+            
+        </figcaption>
+        
+    </figure>
+    
+    
+    <p><strong>適当に検索して出てきた日本語の論文(全国大会など)</strong></p>
+    
+    <ul>
+    <li><a href="http://db-event.jpn.org/deim2013/proceedings/pdf/e1-3.pdf">SAX適用において利用者が注意すべき特性についての検討</a> DEIM2013</li>
+    </ul>
+    
+    <p><strong>関連サイト</strong></p>
+    
+    <ul>
+    <li><a href="http://www.cs.ucr.edu/~eamonn/SAX.htm">Welcome to SAX Homepage!</a></li>
+    <li><a href="http://cs.gmu.edu/~jessica/SAX_DAMI_preprint.pdf">Experiencing SAX (preprint, direct link)</a></li>
+    </ul>
+    
+</section>
+</article>
+</body>
+</html>

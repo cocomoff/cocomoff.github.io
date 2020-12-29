@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      taki["github-page"]
+    </title>
+    <meta name="author" content="Jake Rocheleau">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:800,400,600,700' rel='stylesheet'>
+    <link href='http://fonts.googleapis.com/css?family=EB+Garamond:800,400,600,700' rel='stylesheet'>
+    <link href='http://fonts.googleapis.com/css?family=Volkhov' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Ruluko' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/styles.css">
+    <link rel="stylesheet" type="text/css" href="../css/responsive.css">
+  
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+  
+    <script type="text/x-mathajx-config">
+    MathJax.Hub.Config({
+    tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[','\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+    extensions: ["AMSmath.js", "AMSsymbols.js"] }
+    }
+    });
+  </script>
+</head>
+
+<body id="w" itemscope itemtype="http://schema.org/Person">
+
+<header class="clearfix">
+	<div id="info">
+        <h4>
+            <a href="/index.html">Topに戻る</a>
+        </h4>
+		<h1>
+            CFTPを勉強しよう (その1)
+        </h1>
+		<small itemprop="address" itemscope itemtype="http://schema.org/PostalAddress"></small>
+		<span itemprop="addressCountry">作成日: 2017/02/02</span>
+	</div>
+</header>
+<article>
+<section id="articles">
+
+    <p>題材は「完璧にサンプリングしよう！」です。来嶋先生のページで中身が公開されています（参考: <a href="http://tcslab.csce.kyushu-u.ac.jp/~kijima/documents/OR05-03.pdf">直リンク</a> / <a href="http://tcslab.csce.kyushu-u.ac.jp/~kijima/">先生のページ</a>）</p>
+
+    <p>題材を真似して打ち切りを行う部分を作りました。記事の中身を真似して、更新関数はサイコロ風にハードコーディングしてあります。</p>
+    
+    <pre><code class="language-python">import numpy as np
+np.random.seed(0)
+
+def random2dice(u):
+    return int(u * 6.0) + 1
+
+x = np.random.rand(100)
+dice = [random2dice(u) for u in x]
+
+update_table = {
+    1: [0, 0, 2],  # サイコロ1では状態0→0, 1→0, 2→2
+    2: [1, 0, 1],
+    3: [1, 0, 2],
+    4: [2, 1, 1],
+    5: [1, 2, 2],
+    6: [0, 2, 0]
+}
+
+fix_list = [-1.0, 3.9/6.0, 5.9/6.0,  
+2.9/6.0, 3.9/6.0, 4.9/6.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+def cftp(states=3, max_iter = 4, verbose=False):
+    T = -1
+    llbd = []
+    ldice = []
+    counter = 0
+    
+    while True:
+        counter += 1
+        # lbd = np.random.rand()
+        lbd = fix_list[counter]
+        llbd.insert(0, lbd)
+        ldice.insert(0, random2dice(lbd))
+        ls = [i for i in range(states)]
+        for dice in ldice:
+            for i, st in enumerate(ls):
+                new_state = update_table[dice][st]
+                ls[i] = new_state
+        if verbose:
+            print(ldice, &quot;\tTo: &quot;, list(map(lambda v: str(v+1), ls)))
+            
+        dd = {}
+        for elem in ls: 
+            dd[elem] = 1
+        if len(dd.keys()) == 1:
+            return list(dd.keys())[0]
+stop = cftp() 
+print(stop)</code></pre>
+
+    <p>verboseをTrueにして渡すと、いろいろ結果が代わります。</p>
+    
+    <pre><code class="language-txt">[4] 	To:  ['3', '2', '2']
+[6, 4] 	To:  ['3', '2', '3']
+[1, 6, 4] 	To:  ['3', '3', '3']
+2</code></pre>
+    
+    <pre><code class="language-txt">[4] 	To:  ['3', '2', '2']
+[3, 4] 	To:  ['2', '3', '2']
+[4, 3, 4] 	To:  ['2', '3', '3']
+[3, 4, 3, 4] 	To:  ['3', '2', '3']
+[2, 3, 4, 3, 4] 	To:  ['2', '3', '2']
+[1, 2, 3, 4, 3, 4] 	To:  ['2', '2', '2']
+1</code></pre>
+
+</section>
+</article>
+</body>
+</html>

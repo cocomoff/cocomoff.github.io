@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      taki["github-page"]
+    </title>
+    <meta name="author" content="Jake Rocheleau">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:800,400,600,700' rel='stylesheet'>
+    <link href='http://fonts.googleapis.com/css?family=EB+Garamond:800,400,600,700' rel='stylesheet'>
+    <link href='http://fonts.googleapis.com/css?family=Volkhov' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Ruluko' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/styles.css">
+    <link rel="stylesheet" type="text/css" href="../css/responsive.css">
+  
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+  
+    <script type="text/x-mathajx-config">
+    MathJax.Hub.Config({
+    tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[','\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+    extensions: ["AMSmath.js", "AMSsymbols.js"] }
+    }
+    });
+  </script>
+</head>
+
+<body id="w" itemscope itemtype="http://schema.org/Person">
+
+<header class="clearfix">
+	<div id="info">
+        <h4>
+            <a href="/index.html">Topに戻る</a>
+        </h4>
+		<h1>
+            行列分解を書いてみる (関係データ学習 その2)
+        </h1>
+		<small itemprop="address" itemscope itemtype="http://schema.org/PostalAddress"></small>
+		<span itemprop="addressCountry">作成日: 2017/02/19</span>
+	</div>
+</header>
+<article>
+<script type="text/javascript"
+src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+<section id="articles">
+
+
+
+    <p>前回からの引き続きです: <a href="http://ssg.cocomoff.info/techdiary/170219_matrix1/">行列分解を書いてみる(関係データ学習その2)</a><br>
+        レポジトリも作っています: <a href="https://bitbucket.org/cocomoff/matrixdecompositionjulia">Bitbucket/MatrixDecompositionJulia</a></p>
+        
+        <p>数値的な挙動がいまいち安定しない問題を，会社の先輩に聞いて検証してきました（プログラムを書いてもらいました）．</p>
+        
+        <p><blockquote class="twitter-tweet" data-lang="ja" align="center"><p lang="ja" dir="ltr">関係データ学習を読んで正則化行列分解アルゴリズム適当に書いたら1秒でInfに発散した</p>&mdash; ここもふ (@cocomoff) <a href="https://twitter.com/cocomoff/status/831886492016353280">2017年2月15日</a></blockquote>
+        <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+        
+        <h1 id="結論">結論</h1>
+        
+        <ul>
+        <li>1次の手法は，やはり発散することが多い(誤算がInfに飛ぶ)
+        
+        <ul>
+        <li>小さいデータをサブサンプリングしてやってみると，動く</li>
+        <li>欠損値の扱いに問題があるのかもしれない(MovieLenzを使っている)</li>
+        </ul></li>
+        <li>2次の手法を実装すると，そこそこ動く</li>
+        </ul>
+        
+        <p>実装を見てみます</p>
+        
+        <h1 id="1次の手法-発散しない程度">1次の手法(発散しない程度)</h1>
+        
+        <ul>
+        <li>データを前回使っていたMovieLenz-1mから100Kに変更</li>
+        <li>前回の反省を活かして，入力のうち一部だけを使用して行列分解をやってみる</li>
+        </ul>
+        
+        <pre><code class="language-julia">using DataFrames
+using PyPlot
+using JLD
+
+data_file = &quot;./data/u.data&quot;
+df = readtable(data_file, separator='\t')
+max_user = maximum(df[:, 1])
+max_num = maximum(df[:, 2])
+X = zeros(max_user, max_num)
+for iter=1:size(df)[1]
+    X[df[iter,1], df[iter,2]] = df[iter,3]
+end
+
+# 小さい行列にする
+original_X = copy(X)
+X = X[1:100, 1:100]
+
+# 最適化
+N, M = size(X)
+η = 0.001 # learning parameter
+λ = 0.001 # regularization constant
+K = 10
+ϵ = 1e-5
+U = rand(N, K)
+V = rand(M, K)
+
+# Error
+function fl2(X, U, V, λ)
+    N, M = size(X)
+    ret = 0.5 * (sum(X - U*V') .^ 2)
+
+    # regularization term
+    value = 0.5 * λ * (sum(U .^2) + sum(V .^ 2))
+    ret += λ * 0.5 * value
+    return ret
+end
+
+# 微分
+∇u(U, V) = -X * V + U * (V' * V + λ .* eye(K))
+∇v(U, V) = -X' * U + V * (U' * U + λ .* eye(K))
+
+# update until convergence ?
+n_iter = 1
+errors = []
+while true
+    g = fl2(X, U, V, λ)
+    # println(&quot;Fro $(Fro(U))&quot;)
+    U -= η .* ∇u(U, V)
+    V -= η .* ∇v(U, V)
+    gg = fl2(X, U, V, λ)
+    push!(errors, gg)
+    println(&quot;$n_iter $g -&gt; $gg&quot;)
+    if abs(g - gg) / gg &lt; ϵ
+    break
+    end
+    n_iter += 1
+end
+Xsim = U * V'
+
+figure(figsize=(12, 6))
+subplot(121)
+imshow(X, interpolation=&quot;nearest&quot;, cmap=&quot;Blues&quot;)
+subplot(122)
+imshow(Xsim, interpolation=&quot;nearest&quot;, cmap=&quot;Blues&quot;)
+savefig(&quot;output/compare_1st.png&quot;, format=&quot;png&quot;, dpi=300)
+
+figure(figsize=(6,4))
+plot(errors)
+yscale(&quot;log&quot;)
+savefig(&quot;output/errors_1st.png&quot;)</code></pre>
+        
+        <ul>
+        <li>出力を見てみます(学習率0.002，正則化重み0.001)
+        
+        <ul>
+        <li>行列分解ができているように見えます</li>
+        <li>エラーの履歴は若干あやしいです（これが大きいデータを扱ったときに死ぬ原因の一つ？）</li>
+        </ul></li>
+        </ul>
+        
+        
+        <figure >
+            
+                <img src="/photo/170306_md1.png" />
+            
+            
+            <figcaption>
+                <h4>元データと近似データ</h4>
+                
+            </figcaption>
+            
+        </figure>
+        
+        
+        
+        <figure >
+            
+                <img src="/photo/170306_md2.png" />
+            
+            
+            <figcaption>
+                <h4>誤差数値の推移</h4>
+                
+            </figcaption>
+            
+        </figure>
+        
+        
+        <h1 id="2次の手法">2次の手法</h1>
+        
+        <ul>
+        <li>疑似2次交互勾配降下法の更新式は次のようになります．
+        
+        <ul>
+        <li>\( U \leftarrow (1-\eta) U + \eta XV(V^T V + \lambda I)^{-1} \)</li>
+        <li>\( V \leftarrow (1-\eta) V + \eta X^T U(U^T U + \lambda I)^{-1} \)</li>
+        <li>本のアルゴリズム4.2です．</li>
+        </ul></li>
+        </ul>
+        
+        <p>実装は更新部分が少しだけ変わります．</p>
+        
+        <pre><code class="language-julia">while true
+    g = fl2(X, U, V, λ)
+    U = (1-η) * U + η * X * V * inv(V' * V + λ * eye(K))
+    V = (1-η) * V + η * X' * U * inv(U' * U + λ * eye(K))
+    gg = fl2(X, U, V, λ)
+    push!(errors, gg)
+    println(&quot;$n_iter $g -&gt; $gg&quot;)
+    if abs(g - gg) / gg &lt; ϵ
+    break
+    end
+    n_iter += 1
+end</code></pre>
+        
+        <ul>
+        <li>出力を見てみます(学習率0.01，正則化重み0.01)
+        
+        <ul>
+        <li>値を結構変えて試してみました(このあたりが難しくてよく分からない！)</li>
+        </ul></li>
+        </ul>
+        
+        
+        <figure >
+            
+                <img src="/photo/170306_md3.png" />
+            
+            
+            <figcaption>
+                <h4>元データと近似データ</h4>
+                
+            </figcaption>
+            
+        </figure>
+        
+        
+        
+        <figure >
+            
+                <img src="/photo/170306_md4.png" />
+            
+            
+            <figcaption>
+                <h4>誤差数値の推移</h4>
+                
+            </figcaption>
+            
+        </figure>
+        
+        
+        <ul>
+        <li>そこそこな挙動に見えます．</li>
+        </ul>
+        
+        <h1 id="続く">続く？</h1>
+        
+        <ul>
+        <li>たぶん続きます</li>
+        </ul>
+        
+
+</section>
+</article>
+</body>
+</html>

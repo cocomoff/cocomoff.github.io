@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      taki["github-page"]
+    </title>
+    <meta name="author" content="Jake Rocheleau">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:800,400,600,700' rel='stylesheet'>
+    <link href='http://fonts.googleapis.com/css?family=EB+Garamond:800,400,600,700' rel='stylesheet'>
+    <link href='http://fonts.googleapis.com/css?family=Volkhov' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Ruluko' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/styles.css">
+    <link rel="stylesheet" type="text/css" href="../css/responsive.css">
+  
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+  
+    <script type="text/x-mathajx-config">
+    MathJax.Hub.Config({
+    tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[','\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+    extensions: ["AMSmath.js", "AMSsymbols.js"] }
+    }
+    });
+  </script>
+</head>
+
+<body id="w" itemscope itemtype="http://schema.org/Person">
+
+<header class="clearfix">
+	<div id="info">
+        <h4>
+            <a href="/index.html">Topに戻る</a>
+        </h4>
+		<h1>
+            行列分解を書いてみる (関係データ学習 その2)
+        </h1>
+		<small itemprop="address" itemscope itemtype="http://schema.org/PostalAddress"></small>
+		<span itemprop="addressCountry">作成日: 2017/02/19</span>
+	</div>
+</header>
+<article>
+<section id="articles">
+    <script type="text/javascript"
+    src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+
+    <p><a href="https://www.amazon.co.jp/%E9%96%A2%E4%BF%82%E3%83%87%E3%83%BC%E3%82%BF%E5%AD%A6%E7%BF%92-%E6%A9%9F%E6%A2%B0%E5%AD%A6%E7%BF%92%E3%83%97%E3%83%AD%E3%83%95%E3%82%A7%E3%83%83%E3%82%B7%E3%83%A7%E3%83%8A%E3%83%AB%E3%82%B7%E3%83%AA%E3%83%BC%E3%82%BA-%E7%9F%B3%E9%BB%92-%E5%8B%9D%E5%BD%A6/dp/4061529218/ref=as_li_ss_il?ie=UTF8&qid=1483409350&sr=8-1&keywords=%E9%96%A2%E4%BF%82%E3%83%87%E3%83%BC%E3%82%BF%E5%AD%A6%E7%BF%92&linkCode=li3&tag=taki0313-22&linkId=6332cb53009cd30270722c742b4d9475" target="_blank"><img border="0" src="//ws-fe.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=4061529218&Format=_SL250_&ID=AsinImage&MarketPlace=JP&ServiceVersion=20070822&WS=1&tag=taki0313-22" ></a><img src="https://ir-jp.amazon-adsystem.com/e/ir?t=taki0313-22&l=li3&o=9&a=4061529218" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /></p>
+
+    <p>最近久しぶりにやっていました．まだ問題は解決してない気もしますが，途中で一度まとめておきます．</p>
+    
+    <p><blockquote class="twitter-tweet" data-lang="ja" align="center"><p lang="ja" dir="ltr">関係データ学習を読んで正則化行列分解アルゴリズム適当に書いたら1秒でInfに発散した</p>&mdash; ここもふ (@cocomoff) <a href="https://twitter.com/cocomoff/status/831886492016353280">2017年2月15日</a></blockquote>
+    <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+</section>
+<section>
+    <h2>概要</h2>
+    <p>4章の行列分解アルゴリズムのうち，一階の情報のみを使うアルゴリズム4.1を説明します．</p>
+    
+    <p>(I, J)行列 \(X\) が与えられたときに、2つの行列; (I, R)行列\(U\) と (J, R)行列\(V\)を用意して，\(X\approx UV^T\)の形で近似します．RはIやJよりも小さい値に設定することで，情報をある意味で圧縮したことに相当します．</p>
+    
+    <ul>
+    <li>行列のノルムにフロベニウスノルムを採用した上で，この問題は次のように表すことができます．</li>
+    </ul>
+    
+    <p>\[ \min_{U, V} ||X - UV^T||^2 _\mathrm{Fro} \]</p>
+    
+    <ul>
+    <li>正則化項を導入する場合は次のように表すことができます．</li>
+    </ul>
+    
+    <p>\[ \min_{U, V} ||X - UV^T||^2 _\mathrm{Fro} + \lambda \left( ||U||^2 _\mathrm{Fro}  + ||V||^2 _\mathrm{Fro}\right) \]</p>
+    
+    <ul>
+    <li>具体的には行列U/Vを適当に初期化した後に，次のように計算します(アルゴリズム4.1)．</li>
+    </ul>
+    
+    <pre><code class="language-text">1. U, Vを乱数で初期化
+    2. repeat
+    3.  g &lt;- f(U, V)
+    4.  U &lt;- U - eta * nablaU f(U, V)  [定義] -XV + U(V' V + λI)
+    5.  V &lt;- V - eta * nablaV f(U, V)  [定義] -X'U + V(U'U + λI)
+    6. until | g - f(U, V) | / f(U, V) &lt; ε
+    </code></pre>
+    
+    <hr />
+    
+    <ul>
+    <li>実際に実装してみます．Juliaでは一部のギリシャ文字がそのまま使えるので，使っています．</li>
+    <li>入力データはJLDファイルに書き込まれているとしています．</li>
+    </ul>
+    
+    <h1 id="juliaでの実装">Juliaでの実装</h1>
+    
+    <pre><code class="language-julia">using JLD
+    
+X = jldopen(&quot;data/sample_org.jld&quot;, &quot;r&quot;) do file
+    read(file, &quot;Xorg&quot;)
+end
+
+N, M = size(X)
+η = 0.0000001 # learning parameter
+λ = 0.1 # regularization constant
+K = 20
+# K次元埋め込み
+U = rand(N, K) * 50
+V = rand(M, K) * 50
+
+function Fro(X)
+    sum = 0.0
+    N, M = size(X)
+    for i=1:N, j=1:M
+    sum += (X[i, j] ^ 2)
+    end
+    return sqrt(sum)
+end
+
+# 目的関数
+function fl2(X, U, V, λ)
+    N, M = size(X)
+    ret = 0.0
+    counter = 0
+    for i=1:N, j=1:M
+    ret = (X[i, j] - U[i,:] ⋅ transpose(V[j, :])) ^ 2
+    end
+    ret *= 0.5
+
+    # regularization term
+    value = 0.0
+    for k=1:K
+    for i = 1:N
+        value += U[i, k]^2
+    end
+    for j = 1:M
+        value += V[j, k]^2
+    end
+    end
+    ret += λ * 0.5 * value
+    return ret
+end
+
+# 微分
+function ∇u(X, U, V, λ, K)
+    return -X * V + U * (transpose(V) * V + λ .* eye(K))
+end
+
+function ∇v(X, U, V, λ, K)
+    return -transpose(X) * U + V * (transpose(U) * U + λ .* eye(K))
+end
+
+# update until convergence
+n_iter = 1
+while true
+    g = fl2(X, U, V, λ)
+    # println(&quot;Fro $(Fro(U))&quot;)
+    U -= η .* ∇u(X, U, V, λ, K)
+    V -= η .* ∇v(X, U, V, λ, K)
+    gg = fl2(X, U, V, λ)
+    println(&quot;$n_iter $g -&gt; $gg&quot;)
+    if abs(g - gg) / gg &lt; 1e-3
+    break
+    end
+    n_iter += 1
+end</code></pre>
+    
+    <ul>
+    <li>コードをそのまま書きました．</li>
+    <li>学習率を0.0000001などの小さい値にしないと速攻で発散して死にます</li>
+    <li>正則化パラメータを0.1, 0.01, 0.0で画像出力してみました．</li>
+    </ul>
+    
+    
+    <figure >
+        
+            <img src="/photo/170219_md_fig1.png" />
+        
+        
+        <figcaption>
+            <h4>0.1の場合</h4>
+            
+        </figcaption>
+        
+    </figure>
+    
+    
+    
+    <figure >
+        
+            <img src="/photo/170219_md_fig1.png" />
+        
+        
+        <figcaption>
+            <h4>0.01の場合</h4>
+            
+        </figcaption>
+        
+    </figure>
+    
+    
+    
+    <figure >
+        
+            <img src="/photo/170219_md_fig1.png" />
+        
+        
+        <figcaption>
+            <h4>0の場合</h4>
+            
+        </figcaption>
+        
+    </figure>
+    
+    
+    <ul>
+    <li>結論: <span style="color: red">よく分からない</span>
+    
+    <ul>
+    <li>本などを読んでも簡単に動くようなイメージがあるが，発散してしまいイマイチ実装がうまくいかない．</li>
+    <li>よくある二乗誤差でMSEを使う場合だと，結構うまくいく．ただし正則化をかけると死ぬことがあった．</li>
+    </ul></li>
+    <li>引き続き調査していきます．</li>
+    <li>実装の比較や，よくあるMovieLenz，テンソル版などを2月〜3月でまとめる予定．</li>
+    </ul>
+
+</section>
+</article>
+</body>
+</html>

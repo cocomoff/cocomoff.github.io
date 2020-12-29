@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      taki["github-page"]
+    </title>
+    <meta name="author" content="Jake Rocheleau">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:800,400,600,700' rel='stylesheet'>
+    <link href='http://fonts.googleapis.com/css?family=EB+Garamond:800,400,600,700' rel='stylesheet'>
+    <link href='http://fonts.googleapis.com/css?family=Volkhov' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Ruluko' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/styles.css">
+    <link rel="stylesheet" type="text/css" href="../css/responsive.css">
+  
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+  
+    <script type="text/x-mathajx-config">
+    MathJax.Hub.Config({
+    tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[','\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+    extensions: ["AMSmath.js", "AMSsymbols.js"] }
+    }
+    });
+  </script>
+</head>
+<body id="w" itemscope itemtype="http://schema.org/Person">
+
+<header class="clearfix">
+	<div id="info">
+        <h4>
+            <a href="/index.html">Topに戻る</a>
+        </h4>
+		<h1>
+            束構造で遊ぶ，グラフを描く
+        </h1>
+		<small itemprop="address" itemscope itemtype="http://schema.org/PostalAddress"></small>
+		<span itemprop="addressCountry">作成日: 2017/01/31</span>
+	</div>
+</header>
+<article>
+<section id="articles">
+
+ 
+
+    <p>リハビリ中のトイプログラム等です。<br />
+        飽和アイテム集合の列挙にはNII宇野先生の公開プログラムLCM ver.3を使っています。
+        詳しくは <a href="http://research.nii.ac.jp/~uno/codes-j.htm" title="公開プログラム">公開プログラム</a>を見てください。</p>
+        
+        <h1 id="束構造の辺を計算する">束構造の辺を計算する</h1>
+        
+        <ul>
+        <li>もっと高速に求めたいのですが、あまり真面目に考えたことがないです。</li>
+        </ul>
+        
+        <pre><code class="language-python">input_file = &quot;../LCM30/test.dat&quot;
+output_file = &quot;./output.dat&quot;
+min_support = 1
+cmd = &quot;../LCM30/fim_closed {0} {1} output.dat&quot;.format(input_file, min_support)
+subprocess.call( cmd.strip().split(&quot; &quot;) )
+
+lo_closed_itemsets = []
+
+with open(output_file, &quot;r&quot;) as f:
+    for line in f:
+        line = line.strip()
+        llist = line.split(&quot; &quot;)
+        if len(llist) &gt; 1:
+            int_set = set(map(int, llist[:-1]))
+            lo_closed_itemsets.append( int_set )
+
+transaction_database = []
+with open(input_file, &quot;r&quot;) as f:
+    for line in f:
+        line = line.strip()
+        llist = line.split(&quot;,&quot;)
+        int_set = set( map(int, llist) )
+        transaction_database.append(int_set)
+
+lo_index = []
+for i, itemset_i in enumerate(lo_closed_itemsets):
+    id_list = []
+    for j, itemset_j in enumerate(transaction_database):
+        if itemset_i &lt;= itemset_j:
+            id_list.append(j)
+    lo_index.append(set(id_list))
+
+# build edges
+from collections import defaultdict
+edge_map = {}
+NC = len(lo_closed_itemsets)
+
+# print
+for i in range(min(10, NC)):
+    X, Y = lo_index[i], lo_closed_itemsets[i]
+    print(i, X, Y)
+
+# make edge
+for i in range(NC):
+    X, Y = lo_index[i], lo_closed_itemsets[i]
+    for j in range(i+1, NC):
+        X2, Y2 = lo_index[j], lo_closed_itemsets[j]
+        if Y &lt;= Y2:
+            if i not in edge_map:
+                edge_map[i] = set({j})
+            else:
+                edge_map[i].add(j)
+
+for key in edge_map:
+    print(key, edge_map[key])
+
+edge_direct_inv_map = {}
+for key in edge_direct_map:
+    for v in edge_direct_map[key]:
+        if v not in edge_direct_inv_map:
+            edge_direct_inv_map[v] = set({key})
+        else:
+            edge_direct_inv_map[v].add(key)
+
+def set2str(S):
+    if len(S) == 0:
+        return &quot;&quot;
+    else:
+        s = &quot;,&quot;.join(map(str, S))
+        return s
+
+# 出力
+edge_output_file = &quot;output_edge.dat&quot;
+with open(edge_output_file, &quot;w&quot;) as f:
+    for cid in range(NC):
+        str_from = set2str(edge_direct_inv_map[cid])
+        str_to = set2str(edge_direct_map[cid])
+        f.write(&quot;{0}#{1}#{2}\n&quot;.format(cid, str_from, str_to))</code></pre>
+        
+        <ul>
+        <li>出力はこんな感じになります。</li>
+        </ul>
+        
+        <blockquote>
+        <p>0#-2#2<br />
+          1#-2#2,3<br />
+          2#0,1#4,5<br />
+          3#1#4<br />
+          4#2,3#-1<br />
+          5#2#-1</p>
+        </blockquote>
+        
+        <h1 id="束構造を描いてみる">束構造を描いてみる</h1>
+        
+        <p>PythonのGraphviz用パッケージを利用してみました。</p>
+        
+        <pre><code class="language-python">from graphviz import Digraph
+G = Digraph(format=&quot;png&quot;)
+G.attr(&quot;node&quot;, shape=&quot;circle&quot;)
+
+for i in range(NC):
+    G.node(str(i), str(i))
+G.node(str(-1), str(-1))
+G.node(str(-2), str(-2))
+    
+for i in range(NC):
+    for j in edge_map[i]:
+        G.edge(str(j), str(i))
+    for j in edge_inv_map[i]:
+        if j == -1:
+            G.edge(str(i), str(j))</code></pre>
+        
+        <ul>
+        <li>かなり手抜きですが、とりあえず描けた（-1と-2を上下逆にするように重みを設定すればいいはずだけど、とりあえず放置)</li>
+        </ul>
+        
+        
+        <figure >
+            
+                <img src="/photo/170131_lattice.png" />
+            
+            
+            <figcaption>
+                <h4>束(手抜き)</h4>
+                
+            </figcaption>
+            
+        </figure>
+        
+        
+        <div style="height: 120px"></div>
+        
+        <p>後日に続きます（続かないかもしれない）</p>
+
+</section>
+</article>
+</body>
+</html>

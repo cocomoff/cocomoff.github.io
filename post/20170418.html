@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>
+      taki["github-page"]
+    </title>
+    <meta name="author" content="Jake Rocheleau">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:800,400,600,700' rel='stylesheet'>
+    <link href='http://fonts.googleapis.com/css?family=EB+Garamond:800,400,600,700' rel='stylesheet'>
+    <link href='http://fonts.googleapis.com/css?family=Volkhov' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Ruluko' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/monokai-sublime.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/styles.css">
+    <link rel="stylesheet" type="text/css" href="../css/responsive.css">
+  
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+  
+    <script type="text/x-mathajx-config">
+    MathJax.Hub.Config({
+    tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\[','\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+    extensions: ["AMSmath.js", "AMSsymbols.js"] }
+    }
+    });
+  </script>
+</head>
+
+<body id="w" itemscope itemtype="http://schema.org/Person">
+
+<header class="clearfix">
+	<div id="info">
+        <h4>
+            <a href="/index.html">Topに戻る</a>
+        </h4>
+		<h1>
+            [Python][OpenAI Gym] OpenAI GymとAsciinema環境の整備
+        </h1>
+		<small itemprop="address" itemscope itemtype="http://schema.org/PostalAddress"></small>
+		<span itemprop="addressCountry">作成日: 2017/03/19</span>
+	</div>
+</header>
+<article>
+<section id="articles">
+
+
+    <p><a href="https://gym.openai.com/">OpenAI Gym</a>を使う場合，atariなどの環境だとMonitorしているときに
+        mp4が保存されますが，text系の環境(論文でよく出てくるTaxiや，三目並べなどです)を使う場合Jsonファイルで出力されます．
+        これをOpenAI Gymへ公開すれば(おそらく)再生して見ることができるのですが，これをローカル環境で
+        再現するために<a href="https://asciinema.org/"><strong>asciinema</strong></a>環境を整備しました．</p>
+        
+        <h1 id="asciinemaのインストール">asciinemaのインストール</h1>
+        
+        <p><strong>環境</strong></p>
+        
+        <ul>
+        <li>Ubuntu 16.04 LTS</li>
+        </ul>
+        
+        <p><a href="https://asciinema.org/docs/installation">公式サイトに書いてある</a>通りにapt-getでインストールします．</p>
+        
+        <pre><code class="language-text">sudo apt-add-repository ppa:zanchey/asciinema  
+sudo apt-get update  
+sudo apt-get install asciinema</code></pre>
+        
+        <h1 id="openai-gymでasciinemaファイルの作成-例">OpenAI GymでAsciinemaファイルの作成(例)</h1>
+        
+        <p>論文でよく見るTaxi Domainを使ってみます．中身は最低限にしてあります．<strong>Taxi-v2</strong>(コメント: 最近のgymをgitからインストールすると，v1が使えなくなってv2にアップデートされている)の環境を作り，適当に10ステップだけランダム行動します．結果<strong>taxi_simple</strong>のディレクトリにファイルが出力されます（これをアップロードすると，記録される）</p>
+        
+        <ul>
+        <li><a href="https://gist.github.com/cocomoff/aff7ee699d08c68f79f1c0953d05e9fa">python script (gist)</a></li>
+        <li><a href="https://gist.github.com/cocomoff/a51d91e9e4de281aa63bb9ad3dabff29">output json file (gist)</a></li>
+        </ul>
+        
+        <pre><code class="language-python">import gym
+from gym.wrappers import Monitor
+
+def main():
+    GAME    = &quot;Taxi-v2&quot;
+    env     = gym.make(GAME)
+    n_state = env.observation_space.n
+    n_action = env.action_space.n
+    env = Monitor(env, &quot;taxi_simple&quot;, force=True)
+
+    s = env.reset()
+    steps = 10
+    for step in range(steps):
+        env.render()
+        action = env.action_space.sample()
+        s, r, done, info = env.step(action)
+
+    # close environment and monitor
+    env.close()
+
+if __name__ == '__main__':
+    main()</code></pre>
+        
+        <h1 id="asciinema-playを利用して出力を再生する">Asciinema Playを利用して出力を再生する</h1>
+        
+        <p>単純に<strong>asciinema play</strong>で再生可能です．例を公開しました．これでいつでもローカルでエージェントの行動を見ることができますね．</p>
+        
+        <script type="text/javascript" src="https://asciinema.org/a/114361.js" id="asciicast-114361" async></script>
+        
+
+
+</section>
+</article>
+</body>
+</html>
