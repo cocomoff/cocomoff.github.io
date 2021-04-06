@@ -1,4 +1,5 @@
 @media only screen and (max-width: 940px) {
+	/*
 	h1 { font-size: 1.6em; }
 	h3 { font-size: 1.1em; }
 	h2 { font-size: 1.3em; display: block; text-align: center; }
@@ -9,7 +10,7 @@
 		text-align: center;
 	}
 	#w { padding: 20px 15px; }
-	p { padding: 0; text-align: center;}
+	p { padding: 0; text-align: center;}*/
 }
 
 @media only screen and (max-width: 770px) {

@@ -4,7 +4,7 @@
 }
 
 * {
-	font-family: "Meiryo", "Ruluko", "Open Sans";
+	font-family:  "M PLUS Rounded 1c", "Kiwi Maru", "Meiryo", "Ruluko", "Open Sans";
 }
 
 html { 
@@ -18,8 +18,8 @@ body {
 
 /* Headers */
 
-h1, h2 { font-family: "Meiryo", "Ruluko", "Open Sans", "Trebuchet MS", Arial, sans-serif;  }
-h3, h4 { font-family: "Meiryo", "Ruluko", "Open Sans", "Trebuchet MS", Verdana, Arial, sans-serif; }
+h1, h2 { font-family:  "M PLUS Rounded 1c", "Kiwi Maru", "Meiryo", "Ruluko", "Open Sans", "Trebuchet MS", Arial, sans-serif;  }
+h3, h4 { font-family:  "M PLUS Rounded 1c", "Kiwi Maru", "Meiryo", "Ruluko", "Open Sans", "Trebuchet MS", Verdana, Arial, sans-serif; }
 h1 { color: #454545; font-size: 1.6em; margin-bottom: 6px; }
 h2 { color: #484848; font-size: 1.3em; margin-bottom: 10px; text-decoration: underline; }
 h2.border {
