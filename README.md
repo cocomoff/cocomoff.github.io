@@ -1,2 +1,1 @@
 # cocomoff.github.io
-Pages
